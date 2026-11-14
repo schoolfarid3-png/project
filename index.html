@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بوابة أبو سمرة الرقمية</title>
+  <title>بوابة أبوسمرة الرقمية</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -384,9 +384,9 @@
 
   <header id="mainHeader">
     <div class="sponsor-badge">
-      <h2>معرض أبو سمرة للسجاد بقويسنا</h2>
+      <h2>معرض أبوسمرة للسجاد بقويسنا</h2>
     </div>
-    <p>أهلاً بكم في بوابة أبو سمرة الرقمية</p>
+    <p>أهلاً بكم في بوابة أبوسمرة الرقمية</p>
   </header>
 
   <main>
@@ -432,7 +432,7 @@
         <div id="regMsg" class="message"></div>
       </div>
 
-      <!-- نموذج تفعيل الحساب -->
+   <!-- نموذج تفعيل الحساب -->
       <div id="activationSection" class="hidden">
         <h3>تفعيل الحساب</h3>
         <p id="activationStatusMsg" style="font-size: 1rem; text-align: center; color: #51cf66; font-weight: 700; margin-bottom: 16px;"></p>
@@ -444,7 +444,7 @@
               <span class="step-title">التوجه إلى صفحة معرض أبو سمرة</span>
             </div>
             <p class="step-text">اضغط على الزر التالي لفتح الصفحة الرسمية للمعرض على فيسبوك:</p>
-            <a href="https://www.facebook.com/carperts.abousamra" target="_blank" rel="noopener" class="fb-link-btn">الانتقال إلى صفحة المعرض ↗</a>
+            <a href="https://www.facebook.com/carperts.abousamra" target="_blank" rel="noopener" onclick="window.open(this.href, '_blank'); return false;" class="fb-link-btn">الانتقال إلى صفحة المعرض ↗</a>
           </div>
 
           <div class="step-card">
@@ -464,7 +464,7 @@
               <span class="step-num">3</span>
               <span class="step-title">إرسال الكلمة في البوست المثبت</span>
             </div>
-            <p class="step-text">اكتب الكلمة المنسوخة في تعليق على البوست المثبت بالصفحة (أواى بوست) الذي يحمل العنوان التالي، ليصلك كود التفعيل فوراً:</p>
+            <p class="step-text">اكتب الكلمة المنسوخة في تعليق على البوست المثبت بالصفحة (أو أي بوست) الذي يحمل العنوان التالي، ليصلك كود التفعيل فوراً:</p>
             <span class="post-title-highlight" id="dynamicPostTitle">---</span>
           </div>
         </div>
@@ -477,6 +477,8 @@
         <button class="switch-btn" onclick="showSection('loginSection')">العودة لتسجيل الدخول</button>
         <div id="activationMsg" class="message"></div>
       </div>
+
+
       <!-- لوحة التحكم -->
       <div id="dashboardSection" class="hidden" style="width: 100%;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
