@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بوابة أبوسمرة الرقمية</title>
+  <title>بوابة ابوسمرة الرقمية</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -384,9 +384,9 @@
 
   <header id="mainHeader">
     <div class="sponsor-badge">
-      <h2>معرض أبوسمرة للسجاد بقويسنا</h2>
+      <h2>معرض ابوسمرة للسجاد بقويسنا</h2>
     </div>
-    <p>أهلاً بكم في بوابة أبوسمرة الرقمية</p>
+    <p>أهلاً بكم في بوابة ابوسمرة الرقمية</p>
   </header>
 
   <main>
@@ -432,7 +432,7 @@
         <div id="regMsg" class="message"></div>
       </div>
 
-   <!-- نموذج تفعيل الحساب -->
+      <!-- نموذج تفعيل الحساب -->
       <div id="activationSection" class="hidden">
         <h3>تفعيل الحساب</h3>
         <p id="activationStatusMsg" style="font-size: 1rem; text-align: center; color: #51cf66; font-weight: 700; margin-bottom: 16px;"></p>
@@ -517,8 +517,42 @@
       }
     }
 
+    // دالة لحفظ بيانات التفعيل مؤقتاً في المتصفح لعدم فقدانها عند الرجوع
+    function saveActivationState(username, keyword, postTitle, statusMsg) {
+      localStorage.setItem('abousamra_act_user', username);
+      localStorage.setItem('abousamra_act_word', keyword);
+      localStorage.setItem('abousamra_act_post', postTitle);
+      localStorage.setItem('abousamra_act_msg', statusMsg);
+    }
+
+    function clearActivationState() {
+      localStorage.removeItem('abousamra_act_user');
+      localStorage.removeItem('abousamra_act_word');
+      localStorage.removeItem('abousamra_act_post');
+      localStorage.removeItem('abousamra_act_msg');
+    }
+
+    function openActivationWithSavedData() {
+      showSection('activationSection');
+      const savedUser = localStorage.getItem('abousamra_act_user');
+      const savedWord = localStorage.getItem('abousamra_act_word');
+      const savedPost = localStorage.getItem('abousamra_act_post');
+      const savedMsg = localStorage.getItem('abousamra_act_msg');
+
+      if (savedUser) currentUsernameForActivation = savedUser;
+      if (savedWord) document.getElementById('wordToCopy').innerText = savedWord;
+      if (savedPost) document.getElementById('dynamicPostTitle').innerText = savedPost;
+      if (savedMsg) document.getElementById('activationStatusMsg').innerText = savedMsg;
+    }
+
     window.onload = async function() {
       clearAllInputs();
+
+      // التحقق مما إذا كان الرابط ينتهي بـ #activationSection
+      if (window.location.hash === '#activationSection') {
+        openActivationWithSavedData();
+      }
+
       const data = await callBackend("getInitData");
       if (data && data.bgImage && data.bgImage.trim() !== "") {
         const cover = document.getElementById('coverImg');
@@ -533,6 +567,13 @@
         wrapper.style.display = "block";
       }
     };
+
+    // الاستماع لأي تغيير في الرابط أثناء فتح الصفحة
+    window.addEventListener('hashchange', function() {
+      if (window.location.hash === '#activationSection') {
+        openActivationWithSavedData();
+      }
+    });
 
     function clearAllInputs() {
       document.querySelectorAll('input').forEach(input => input.value = "");
@@ -563,6 +604,13 @@
       }
 
       document.getElementById(sectionId).classList.remove('hidden');
+
+      // تحديث الرابط تلقائياً عند فتح قسم التفعيل
+      if (sectionId === 'activationSection') {
+        history.replaceState(null, null, '#activationSection');
+      } else if (window.location.hash === '#activationSection') {
+        history.replaceState(null, null, ' ');
+      }
     }
 
     function copyWord() {
@@ -610,10 +658,15 @@
       const response = await callBackend("registerUser", { name, username, password });
       if (response.status === "success") {
         currentUsernameForActivation = username;
+        const statusText = "تم التسجيل بنجاح! اتبع الخطوات التالية لفتح حسابك:";
+        const formattedTitle = `"${response.postTitle}"`;
+        
+        saveActivationState(username, response.keyword, formattedTitle, statusText);
+        
         showSection('activationSection');
-        document.getElementById('activationStatusMsg').innerText = "تم التسجيل بنجاح! اتبع الخطوات التالية لفتح حسابك:";
+        document.getElementById('activationStatusMsg').innerText = statusText;
         document.getElementById('wordToCopy').innerText = response.keyword;
-        document.getElementById('dynamicPostTitle').innerText = `"${response.postTitle}"`;
+        document.getElementById('dynamicPostTitle').innerText = formattedTitle;
       } else {
         msg.innerHTML = response.message || "حدث خطأ أثناء التسجيل.";
         msg.className = "message error";
@@ -648,13 +701,19 @@
 
       const response = await callBackend("loginUser", { username, password });
       if (response.status === "success") {
+        clearActivationState();
         loadDashboard();
       } else if (response.status === "inactive") {
         currentUsernameForActivation = username;
+        const statusText = "حسابك غير مفعل بعد. اتبع الخطوات التالية لفتح حسابك:";
+        const formattedTitle = `"${response.postTitle}"`;
+
+        saveActivationState(username, response.keyword, formattedTitle, statusText);
+
         showSection('activationSection');
-        document.getElementById('activationStatusMsg').innerText = "حسابك غير مفعل بعد. اتبع الخطوات التالية لفتح حسابك:";
+        document.getElementById('activationStatusMsg').innerText = statusText;
         document.getElementById('wordToCopy').innerText = response.keyword;
-        document.getElementById('dynamicPostTitle').innerText = `"${response.postTitle}"`;
+        document.getElementById('dynamicPostTitle').innerText = formattedTitle;
       } else {
         msg.innerHTML = response.message || "بيانات الدخول غير صحيحة.";
         msg.className = "message error";
@@ -678,6 +737,7 @@
       if (response.status === "success") {
         msg.innerHTML = response.message;
         msg.className = "message success";
+        clearActivationState();
         setTimeout(function() {
           currentUsernameForActivation = "";
           loadDashboard();
@@ -736,6 +796,7 @@
 
     function logout() {
       currentUsernameForActivation = "";
+      clearActivationState();
       document.getElementById('linksContainer').innerHTML = "";
       showSection('loginSection');
     }
