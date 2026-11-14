@@ -545,12 +545,16 @@
     }
 
     window.onload = async function() {
+      // استرجاع اسم المستخدم المحفوظ لكي يظهر تلقائياً
+      const savedUser = localStorage.getItem('abousamra_logged_user');
+      if (savedUser) {
+        document.getElementById('loginUsername').value = savedUser;
+      }
+
       // التحقق مما إذا كانت هناك بيانات تفعيل محفوظة عند عودة المستخدم من الرابط الخارجي
-      const savedUser = localStorage.getItem('abousamra_act_user');
-      if (savedUser || window.location.hash === '#activationSection') {
+      const savedActUser = localStorage.getItem('abousamra_act_user');
+      if (savedActUser || window.location.hash === '#activationSection') {
         openActivationWithSavedData();
-      } else {
-        clearAllInputs();
       }
 
       const data = await callBackend("getInitData");
@@ -575,7 +579,12 @@
     });
 
     function clearAllInputs() {
-      document.querySelectorAll('input').forEach(input => input.value = "");
+      document.querySelectorAll('input').forEach(input => {
+        // لا تمسح اسم المستخدم المحفوظ لو كنا في شاشة تسجيل الدخول
+        if(input.id !== 'loginUsername' || !localStorage.getItem('abousamra_logged_user')) {
+          input.value = "";
+        }
+      });
       document.querySelectorAll('.message').forEach(msg => {
         msg.innerHTML = "";
         msg.className = "message";
@@ -701,6 +710,8 @@
 
       const response = await callBackend("loginUser", { username, password });
       if (response.status === "success") {
+        // حفظ اسم المستخدم محلياً لكي يظهر في المرات القادمة
+        localStorage.setItem('abousamra_logged_user', username);
         clearActivationState();
         loadDashboard();
       } else if (response.status === "inactive") {
@@ -737,6 +748,8 @@
       if (response.status === "success") {
         msg.innerHTML = response.message;
         msg.className = "message success";
+        // حفظ اسم المستخدم محلياً بعد التفعيل الناجح
+        localStorage.setItem('abousamra_logged_user', currentUsernameForActivation);
         clearActivationState();
         setTimeout(function() {
           currentUsernameForActivation = "";
@@ -797,8 +810,11 @@
     function logout() {
       currentUsernameForActivation = "";
       clearActivationState();
+      localStorage.removeItem('abousamra_logged_user'); // مسح اسم المستخدم المحفوظ عند الخروج
       document.getElementById('linksContainer').innerHTML = "";
       showSection('loginSection');
+      // إعادة تعيين خانة اسم المستخدم فارغة عند الخروج المتعمد
+      document.getElementById('loginUsername').value = "";
     }
   </script>
 
