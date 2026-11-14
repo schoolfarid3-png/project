@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بوابة ابوسمرة الرقمية</title>
+  <title>بوابة أبوسمرة الرقمية</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -384,9 +384,9 @@
 
   <header id="mainHeader">
     <div class="sponsor-badge">
-      <h2>معرض ابوسمرة للسجاد بقويسنا</h2>
+      <h2>معرض أبوسمرة للسجاد بقويسنا</h2>
     </div>
-    <p>أهلاً بكم في بوابة ابوسمرة الرقمية</p>
+    <p>أهلاً بكم في بوابة أبوسمرة الرقمية</p>
   </header>
 
   <main>
@@ -495,12 +495,11 @@
   </main>
 
   <script>
-    // ⚠️ ضع رابط الـ Web App (الذي ينتهي بـ /exec) هنا بين علامتي التنصيص:
+    // ⚠️ رابط الـ Web App الخاص بك:
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytQ5AZfkd1LsCBSkQwwyEx8RBHhELSMPgf7zl8jKzSUDMOHqUY48Yn_x4n0v798rFm/exec";
 
     let currentUsernameForActivation = "";
 
-    // دالة موحدة للاتصال بالسكريبت الخارجي
     async function callBackend(action, payload = {}) {
       try {
         const response = await fetch(SCRIPT_URL, {
@@ -517,7 +516,7 @@
       }
     }
 
-    // دالة لحفظ بيانات التفعيل مؤقتاً في المتصفح لعدم فقدانها عند الرجوع
+    // دوال لحفظ واسترجاع حالة التفعيل في متصفح المستخدم
     function saveActivationState(username, keyword, postTitle, statusMsg) {
       localStorage.setItem('abousamra_act_user', username);
       localStorage.setItem('abousamra_act_word', keyword);
@@ -546,11 +545,12 @@
     }
 
     window.onload = async function() {
-      clearAllInputs();
-
-      // التحقق مما إذا كان الرابط ينتهي بـ #activationSection
-      if (window.location.hash === '#activationSection') {
+      // التحقق مما إذا كانت هناك بيانات تفعيل محفوظة عند عودة المستخدم من الرابط الخارجي
+      const savedUser = localStorage.getItem('abousamra_act_user');
+      if (savedUser || window.location.hash === '#activationSection') {
         openActivationWithSavedData();
+      } else {
+        clearAllInputs();
       }
 
       const data = await callBackend("getInitData");
@@ -568,7 +568,6 @@
       }
     };
 
-    // الاستماع لأي تغيير في الرابط أثناء فتح الصفحة
     window.addEventListener('hashchange', function() {
       if (window.location.hash === '#activationSection') {
         openActivationWithSavedData();
@@ -587,7 +586,9 @@
       ['loginSection', 'registerSection', 'activationSection', 'dashboardSection'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
       });
-      clearAllInputs();
+      if (sectionId !== 'activationSection') {
+        clearAllInputs();
+      }
       
       const boxContainer = document.getElementById('boxContainer');
       const coverWrapper = document.getElementById('coverWrapper');
@@ -605,7 +606,6 @@
 
       document.getElementById(sectionId).classList.remove('hidden');
 
-      // تحديث الرابط تلقائياً عند فتح قسم التفعيل
       if (sectionId === 'activationSection') {
         history.replaceState(null, null, '#activationSection');
       } else if (window.location.hash === '#activationSection') {
