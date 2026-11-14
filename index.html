@@ -545,6 +545,13 @@
     }
 
     window.onload = async function() {
+      // 0. فحص رابط الصفحة لو جاي من رابط توجيه خارجي ومعاه إشارة تفعيل
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('action') === 'activate' || window.location.hash === '#activationSection') {
+        openActivationWithSavedData();
+        return; // توقف هنا وافتح صفحة التفعيل مباشرة
+      }
+
       // 1. استرجاع اسم المستخدم المحفوظ لكي يظهر تلقائياً في خانة الدخول
       const savedUser = localStorage.getItem('abousamra_logged_user');
       if (savedUser) {
