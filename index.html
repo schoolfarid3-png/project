@@ -516,7 +516,6 @@
       }
     }
 
-    // دوال لحفظ واسترجاع حالة التفعيل في متصفح المستخدم
     function saveActivationState(username, keyword, postTitle, statusMsg) {
       localStorage.setItem('abousamra_act_user', username);
       localStorage.setItem('abousamra_act_word', keyword);
@@ -545,32 +544,32 @@
     }
 
     window.onload = async function() {
-      // 0. فحص رابط الصفحة لو جاي من رابط توجيه خارجي ومعاه إشارة تفعيل
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('action') === 'activate' || window.location.hash === '#activationSection') {
         openActivationWithSavedData();
-        return; // توقف هنا وافتح صفحة التفعيل مباشرة
+        return;
       }
 
-      // 1. استرجاع اسم المستخدم المحفوظ لكي يظهر تلقائياً في خانة الدخول
       const savedUser = localStorage.getItem('abousamra_logged_user');
       if (savedUser) {
         document.getElementById('loginUsername').value = savedUser;
       }
 
-      // 2. التحقق من وجود حالة تفعيل معلقة (لضمان العودة لنفس صفحة التفعيل عند الرجوع من الفيسبوك)
       const savedActUser = localStorage.getItem('abousamra_act_user');
       if (savedActUser || window.location.hash === '#activationSection') {
         openActivationWithSavedData();
       } else {
-        // إذا لم يكن هناك تفعيل معلق، نقوم بفحص بيانات السيرفر أو البداية العادية
         const data = await callBackend("getInitData");
+        
+        // صورة الغلاف من F2
         if (data && data.bgImage && data.bgImage.trim() !== "") {
           const cover = document.getElementById('coverImg');
           const coverWrapper = document.getElementById('coverWrapper');
           cover.src = data.bgImage.trim();
           coverWrapper.style.display = "block";
         }
+        
+        // صورة البانر من F3
         if (data && data.bannerImage && data.bannerImage.trim() !== "") {
           const banner = document.getElementById('bannerImg');
           const wrapper = document.getElementById('bannerWrapper');
@@ -588,7 +587,6 @@
 
     function clearAllInputs() {
       document.querySelectorAll('input').forEach(input => {
-        // لا تمسح اسم المستخدم المحفوظ لو كنا في شاشة تسجيل الدخول
         if(input.id !== 'loginUsername' || !localStorage.getItem('abousamra_logged_user')) {
           input.value = "";
         }
@@ -603,237 +601,4 @@
       ['loginSection', 'registerSection', 'activationSection', 'dashboardSection'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
       });
-      if (sectionId !== 'activationSection') {
-        clearAllInputs();
-      }
-      
-      const boxContainer = document.getElementById('boxContainer');
-      const coverWrapper = document.getElementById('coverWrapper');
-      const bannerWrapper = document.getElementById('bannerWrapper');
-
-      if (sectionId === 'dashboardSection') {
-        boxContainer.style.maxWidth = "1100px";
-        if (coverWrapper) coverWrapper.style.maxWidth = "1100px";
-        if (bannerWrapper) bannerWrapper.style.maxWidth = "1100px";
-      } else {
-        boxContainer.style.maxWidth = "540px";
-        if (coverWrapper) coverWrapper.style.maxWidth = "540px";
-        if (bannerWrapper) bannerWrapper.style.maxWidth = "540px";
-      }
-
-      document.getElementById(sectionId).classList.remove('hidden');
-
-      if (sectionId === 'activationSection') {
-        history.replaceState(null, null, '#activationSection');
-      } else if (window.location.hash === '#activationSection') {
-        history.replaceState(null, null, ' ');
-      }
-    }
-
-    function copyWord() {
-      const text = document.getElementById('wordToCopy').innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        const btn = document.getElementById('copyBtn');
-        btn.innerText = 'تم النسخ ✓';
-        btn.style.background = '#51cf66';
-        btn.style.color = '#fff';
-        setTimeout(() => {
-          btn.innerText = 'نسخ الكلمة';
-          btn.style.background = 'var(--accent-color)';
-          btn.style.color = '#0b0f17';
-        }, 2000);
-      });
-    }
-
-    async function handleRegister() {
-      const name = document.getElementById('regName').value.trim();
-      const username = document.getElementById('regUsername').value.trim();
-      const password = document.getElementById('regPassword').value.trim();
-      const msg = document.getElementById('regMsg');
-
-      if (!name || !username || !password) {
-        msg.innerHTML = "يرجى ملء جميع الحقول.";
-        msg.className = "message error";
-        return;
-      }
-
-      if (username.length < 8) {
-        msg.innerHTML = "اسم المستخدم يجب ألا يقل عن 8 خانات.";
-        msg.className = "message error";
-        return;
-      }
-
-      if (password.length !== 5 || isNaN(password)) {
-        msg.innerHTML = "كلمة المرور يجب أن تكون 5 أرقام بالضبط.";
-        msg.className = "message error";
-        return;
-      }
-
-      msg.innerHTML = "جاري التسجيل...";
-      msg.className = "message";
-
-      const response = await callBackend("registerUser", { name, username, password });
-      if (response.status === "success") {
-        currentUsernameForActivation = username;
-        const statusText = "تم التسجيل بنجاح! اتبع الخطوات التالية لفتح حسابك:";
-        const formattedTitle = `"${response.postTitle}"`;
-        
-        saveActivationState(username, response.keyword, formattedTitle, statusText);
-        
-        showSection('activationSection');
-        document.getElementById('activationStatusMsg').innerText = statusText;
-        document.getElementById('wordToCopy').innerText = response.keyword;
-        document.getElementById('dynamicPostTitle').innerText = formattedTitle;
-      } else {
-        msg.innerHTML = response.message || "حدث خطأ أثناء التسجيل.";
-        msg.className = "message error";
-      }
-    }
-
-    async function handleLogin() {
-      const username = document.getElementById('loginUsername').value.trim();
-      const password = document.getElementById('loginPassword').value.trim();
-      const msg = document.getElementById('loginMsg');
-
-      if (!username || !password) {
-        msg.innerHTML = "يرجى إدخال اسم المستخدم وكلمة المرور.";
-        msg.className = "message error";
-        return;
-      }
-
-      if (username.length < 8) {
-        msg.innerHTML = "اسم المستخدم غير صحيح (يجب ألا يقل عن 8 خانات).";
-        msg.className = "message error";
-        return;
-      }
-
-      if (password.length !== 5 || isNaN(password)) {
-        msg.innerHTML = "كلمة المرور غير صحيحة (يجب أن تكون 5 أرقام).";
-        msg.className = "message error";
-        return;
-      }
-
-      msg.innerHTML = "جاري التحقق...";
-      msg.className = "message";
-
-      const response = await callBackend("loginUser", { username, password });
-      if (response.status === "success") {
-        localStorage.setItem('abousamra_logged_user', username);
-        clearActivationState();
-        loadDashboard();
-      } else if (response.status === "inactive") {
-        currentUsernameForActivation = username;
-        const statusText = "حسابك غير مفعل بعد. اتبع الخطوات التالية لفتح حسابك:";
-        const formattedTitle = `"${response.postTitle}"`;
-
-        saveActivationState(username, response.keyword, formattedTitle, statusText);
-
-        showSection('activationSection');
-        document.getElementById('activationStatusMsg').innerText = statusText;
-        document.getElementById('wordToCopy').innerText = response.keyword;
-        document.getElementById('dynamicPostTitle').innerText = formattedTitle;
-      } else {
-        msg.innerHTML = response.message || "بيانات الدخول غير صحيحة.";
-        msg.className = "message error";
-      }
-    }
-
-    async function handleActivation() {
-      const inputCode = document.getElementById('activationCodeInput').value.trim();
-      const msg = document.getElementById('activationMsg');
-
-      if (!inputCode) {
-        msg.innerHTML = "الرجاء إدخال كود التفعيل.";
-        msg.className = "message error";
-        return;
-      }
-
-      msg.innerHTML = "جاري التفعيل...";
-      msg.className = "message";
-
-      const response = await callBackend("verifyActivationCode", { username: currentUsernameForActivation, inputCode });
-      if (response.status === "success") {
-        msg.innerHTML = response.message;
-        msg.className = "message success";
-        localStorage.setItem('abousamra_logged_user', currentUsernameForActivation);
-        clearActivationState();
-        setTimeout(function() {
-          currentUsernameForActivation = "";
-          loadDashboard();
-        }, 1200);
-      } else {
-        msg.innerHTML = response.message || "كود التفعيل غير صحيح.";
-        msg.className = "message error";
-      }
-    }
-
-    async function loadDashboard() {
-      showSection('dashboardSection');
-      const container = document.getElementById('linksContainer');
-      container.innerHTML = "<p style='text-align:center;'>جاري تحميل الخدمات...</p>";
-
-      const links = await callBackend("getDashboardLinks");
-      if (!links || !Array.isArray(links) || links.length === 0) {
-        container.innerHTML = "<p style='text-align:center;'>لا توجد روابط متاحة حالياً.</p>";
-        return;
-      }
-
-      const defaultIcon = 'https://cdn-icons-png.flaticon.com/512/2991/2991148.png';
-      let html = "<div class='services-grid'>";
-      
-      links.forEach(link => {
-        const title = link.title || "خدمة رقمية";
-        const rawUrl = link.url ? link.url.trim() : "";
-        const hasValidUrl = rawUrl !== "" && rawUrl !== "#" && rawUrl !== "javascript:void(0);";
-        
-        const url = hasValidUrl ? rawUrl : "javascript:void(0);";
-        const clickAction = hasValidUrl ? `href="${url}" target="_blank"` : `href="javascript:void(0);" onclick="return false;" style="cursor: default;"`;
-        
-        const desc = link.description || "";
-        const img = (link.image && link.image.trim() !== "") ? link.image.trim() : defaultIcon;
-        
-        const badgeText = hasValidUrl ? "فتح البوابة ←" : "قريباً";
-        const badgeStyle = hasValidUrl ? 
-          "background: rgba(26, 115, 232, 0.2); color: #60a5fa; border: 1px solid rgba(26, 115, 232, 0.4);" : 
-          "background: rgba(255, 255, 255, 0.05); color: #94a3b8; border: 1px solid rgba(255, 255, 255, 0.1);";
-
-        html += `
-          <a ${clickAction} class="service-card">
-            <img src="${img}" alt="${title}" class="service-img" onerror="this.src='${defaultIcon}'">
-            <div>
-              <div class="service-title">${title}</div>
-              <div class="service-desc">${desc}</div>
-            </div>
-            <span class="service-badge" style="${badgeStyle}">${badgeText}</span>
-          </a>
-        `;
-      });
-      
-      html += "</div>";
-      container.innerHTML = html;
-    }
-
-    function logout() {
-      currentUsernameForActivation = "";
-      clearActivationState();
-      localStorage.removeItem('abousamra_logged_user');
-      document.getElementById('linksContainer').innerHTML = "";
-      showSection('loginSection');
-      document.getElementById('loginUsername').value = "";
-    }
-  </script>
-
-  <div class="banner-container" id="infoCardWrapper" style="display: block; margin-top: 20px;">
-    <div style="background-color: #141b29; border: 1.5px solid #ffd700; border-radius: 14px; padding: 25px; text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);">
-      <div style="font-size: 2.5rem; margin-bottom: 12px;">📢</div>
-      <div style="color: #ffffff; font-size: 1.15rem; font-weight: 700; line-height: 1.5; margin-bottom: 15px;">
-        لإضافة خدماتك التعليمية أو حجز مساحة في المنصة، يرجى التواصل معنا مباشرةً عبر الرقم:
-      </div>
-      <div style="display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(255, 215, 0, 0.1); padding: 10px; border-radius: 10px; width: fit-content; margin: 0 auto;">
-        <span style="font-size: 1.5rem;">📞</span>
-        <span style="color: #ffd700; font-size: 1.4rem; font-weight: 900; direction: ltr; display: inline-block;">01007224443</span>
-      </div>
-    </div>
-  </div>
-</body>
-</html>
+      if (section
