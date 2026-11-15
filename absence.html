@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>استعلام الغياب - مدرسة الشهيد فريد مجدي فريد</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #1a73e8;
+      --accent-color: #ffd700;
+      --accent-glow: rgba(255, 215, 0, 0.25);
+      --bg-dark: #0b0f17;
+      --card-bg: #141b29;
+      --input-bg: rgba(255, 255, 255, 0.09);
+      --text-light: #ffffff;
+      --text-muted: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: "Cairo", sans-serif;
+      background: linear-gradient(135deg, #090d16 0%, #162033 50%, #090d16 100%);
+      color: var(--text-light);
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 600px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .container {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 28px 22px;
+      width: 100%;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.7), 0 0 24px var(--accent-glow);
+      border: 1.5px solid rgba(255, 215, 0, 0.35);
+    }
+
+    h2 {
+      margin: 0 0 8px 0;
+      font-size: 1.6rem;
+      color: var(--accent-color);
+      font-weight: 900;
+    }
+
+    h3 {
+      color: #fff;
+      text-shadow: 0 0 8px rgba(255,255,255,0.4);
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 1.15rem;
+    }
+
+    input {
+      width: 85%;
+      padding: 14px 16px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(255, 255, 255, 0.28);
+      background: var(--input-bg);
+      color: #fff;
+      text-align: center;
+      margin-bottom: 15px;
+      font-family: inherit;
+      font-weight: 600;
+    }
+
+    input:focus { outline: none; border-color: var(--accent-color); background: rgba(255, 255, 255, 0.14); }
+
+    button {
+      margin-top: 5px;
+      padding: 12px 25px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background-color: var(--accent-color);
+      color: #0b0f17;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 800;
+      transition: 0.3s;
+      box-shadow: 0 4px 12px rgba(255, 215, 0, 0.25);
+    }
+
+    button:hover { background-color: #ffb300; transform: translateY(-2px); }
+
+    .back-home-btn {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      margin-top: 15px;
+      width: 100%;
+    }
+    .back-home-btn:hover {
+      background: rgba(255, 215, 0, 0.2);
+      color: var(--accent-color);
+    }
+
+    .result {
+      margin-top: 15px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 15px;
+      border-radius: 15px;
+      line-height: 1.8;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .highlight, .item {
+      background: linear-gradient(to left, rgba(0, 0, 0, 0.35), rgba(255, 255, 255, 0.05));
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-align: right;
+      font-size: 17px;
+      flex-wrap: wrap;
+    }
+
+    .national-card {
+      background: linear-gradient(to left, rgba(255, 215, 0, 0.25), rgba(255, 255, 255, 0.05));
+      border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .code-card {
+      background: linear-gradient(to left, rgba(0, 128, 255, 0.25), rgba(255, 255, 255, 0.05));
+      border: 1px solid rgba(0, 128, 255, 0.3);
+    }
+
+    .label {
+      font-weight: 700;
+      color: var(--accent-color);
+      flex: 1;
+      text-align: right;
+    }
+
+    .value {
+      flex: 2;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 900;
+      color: #7df9ff;
+      text-shadow: 1px 1px 4px #000;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 15px;
+      opacity: 0.9;
+      color: #ccc;
+      line-height: 1.6;
+    }
+
+    .search-type {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .option {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 8px 18px;
+      font-size: 17px;
+      cursor: pointer;
+      transition: 0.3s;
+      user-select: none;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      font-weight: 700;
+    }
+
+    .option:hover { background: rgba(255, 255, 255, 0.2); }
+    .option.active {
+      background: var(--accent-color);
+      color: #0b0f17;
+      font-weight: 900;
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+      border-color: var(--accent-color);
+    }
+
+    @media (max-width: 600px) {
+      .container { width: 95%; padding: 18px; margin: auto; }
+      .highlight, .item { flex-direction: column; text-align: center; }
+      .label, .value { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <div class="container" id="searchPage">
+      <h2>🔎 استعلام الغياب الرقمي</h2>
+      <h3>مدرسة الشهيد فريد مجدي فريد الصناعية العسكرية</h3>
+
+      <div class="search-type">
+        <div id="typeNatID" class="option active" onclick="setSearchType('natID')">📅 الرقم القومي</div>
+        <div id="typeCode" class="option" onclick="setSearchType('code')">🎓 كود الطالب</div>
+      </div>
+
+      <input type="hidden" id="searchType" value="natID">
+      <input type="text" id="query" placeholder="اكتب الرقم القومي هنا" maxlength="14" oninput="convertToArabic(this)">
+      <br>
+      <button onclick="searchStudent()">بحث عن الطالب</button>
+      <button class="back-home-btn" onclick="goToHome()">⬅️ العودة للخدمات الرئيسية</button>
+      <div id="status" style="margin-top: 12px; font-weight: 700;"></div>
+    </div>
+
+    <div class="container" id="resultPage" style="display:none;">
+      <h2>📋 بيانات الطالب</h2>
+      <div id="result" class="result"></div>
+      <button onclick="printResult()">🖨️ طباعة الاستعلام</button>
+      <button onclick="backToSearch()" style="background: rgba(255,255,255,0.15); color:#fff; border:1px solid rgba(255,215,0,0.4);">🔄 بحث جديد</button>
+      <button class="back-home-btn" onclick="goToHome()">⬅️ العودة للخدمات الرئيسية</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    ✨ تصميم وتطوير المنصة برعاية ودعم من: <span style="color:var(--accent-color); font-weight:bold;">معرض أبو سمرة كاربت – قويسنا</span><br>
+    🛠️ إشراف وبرمجة: <span style="color:#7df9ff; font-weight:bold;">الأستاذ أيمن محمد البرعي</span> (وكيل شئون الطلبة)<br>
+    📞 <span style="direction: ltr; display: inline-block;">01007224443</span>
+  </div>
+
+  <script>
+    // ⚠️ ضع هنا رابط الـ Web App الخاص بسكريبت الغياب على جوجل شيت
+    const ABSENCE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAcK-ZteO_VqxI-2oUzv9nTxZwGjqwtrZBK5prJ6JpEC6-8ATaDazsc1EzBjYQDOPp/exec";
+
+    function setSearchType(type) {
+      document.getElementById("searchType").value = type;
+      document.getElementById("typeNatID").classList.remove("active");
+      document.getElementById("typeCode").classList.remove("active");
+      const queryInput = document.getElementById("query");
+      queryInput.value = "";
+      if (type === "natID") {
+        document.getElementById("typeNatID").classList.add("active");
+        queryInput.placeholder = "اكتب الرقم القومي هنا";
+        queryInput.maxLength = 14;
+      } else {
+        document.getElementById("typeCode").classList.add("active");
+        queryInput.placeholder = "اكتب كود الطالب هنا";
+        queryInput.maxLength = 10;
+      }
+    }
+
+    function convertToArabic(input) {
+      input.value = input.value.replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+    }
+
+    function arabicToEnglishNumbers(str) {
+      return str.replace(/[٠-٩]/g, d => '0123456789'['٠١٢٣٤٥٦٧٨٩'.indexOf(d)]);
+    }
+
+    function toArabicDigits(str) {
+      if (!str || str === "") return "—";
+      return str.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+    }
+
+    function formatArabicDate(dateStr) {
+      if (!dateStr || dateStr === "") return "—";
+      return dateStr.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+    }
+
+    async function searchStudent() {
+      const queryInput = document.getElementById("query");
+      const status = document.getElementById("status");
+      const type = document.getElementById("searchType").value;
+      let query = arabicToEnglishNumbers(queryInput.value.trim());
+
+      if (query === "") {
+        status.innerHTML = "⚠️ من فضلك أدخل البيانات المطلوبة";
+        status.style.color = "#ff6b6b";
+        return;
+      }
+      if (type === "natID" && query.length !== 14) {
+        status.innerHTML = "⚠️ الرقم القومي يجب أن يكون ١٤ رقمًا";
+        status.style.color = "#ff6b6b";
+        return;
+      }
+
+      status.innerHTML = '<span style="color:#ffd700;font-weight:bold;">🔍 جاري البحث...</span>';
+
+      try {
+        const response = await fetch(ABSENCE_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "searchStudent", query, type })
+        });
+        const data = await response.json();
+
+        if (!data) {
+          status.innerHTML = "❌ لا توجد بيانات لهذا الرقم";
+          status.style.color = "#ff6b6b";
+          return;
+        }
+        if (data.error) {
+          status.innerHTML = "❌ " + data.error;
+          status.style.color = "#ff6b6b";
+          return;
+        }
+
+        document.getElementById("searchPage").style.display = "none";
+        document.getElementById("resultPage").style.display = "block";
+        document.getElementById("result").innerHTML = `
+          <div class="highlight"><span class="label">👤 الاسم:</span> <span class="value">${data.student_name || "—"}</span></div>
+          <div class="highlight national-card"><span class="label">🆔 الرقم القومي:</span> <span class="value">${toArabicDigits(data.national_id)}</span></div>
+          <div class="highlight code-card"><span class="label">🎓 كود الطالب:</span> <span class="value">${toArabicDigits(data.student_code)}</span></div>
+          <div class="highlight"><span class="label">📅 عدد أيام الغياب:</span> <span class="value">${toArabicDigits(data.absent_days_count)}</span></div>
+          <div class="item"><span class="label">🗓️ أيام الغياب:</span> <span class="value">${toArabicDigits(data.absent_days)}</span></div>
+          <div class="item"><span class="label">⚠️ الإنذار الأول:</span> <span class="value">${formatArabicDate(data.warning_1)}</span></div>
+          <div class="item"><span class="label">⚠️ الإنذار الثاني:</span> <span class="value">${formatArabicDate(data.warning_2)}</span></div>
+          <div class="item"><span class="label">⚠️ الإنذار الثالث:</span> <span class="value">${formatArabicDate(data.warning_3)}</span></div>
+          <div class="item"><span class="label">🚫 تاريخ الفصل:</span> <span class="value">${formatArabicDate(data.expelled)}</span></div>
+          <div class="item"><span class="label">📝 التخصص:</span> <span class="value">${data.notes || "—"}</span></div>
+          <div class="item"><span class="label">⏰ آخر تحديث:</span><span class="value">${data.update_date}</span></div>
+        `;
+      } catch (error) {
+        console.error(error);
+        status.innerHTML = "❌ تعذر الاتصال بالخادم، تأكد من رابط السكريبت.";
+        status.style.color = "#ff6b6b";
+      }
+    }
+
+    function backToSearch() {
+      document.getElementById("resultPage").style.display = "none";
+      document.getElementById("searchPage").style.display = "block";
+      document.getElementById("query").value = "";
+      document.getElementById("status").innerHTML = "";
+    }
+
+    function goToHome() {
+      // ⚠️ استبدل هذا الرابط برابط صفحة الخدمات أو الرئيسية الخاصة بمنصتك الأساسية
+      window.location.href = "index.html"; 
+    }
+
+    function printResult() {
+      const content = document.getElementById("result").innerHTML;
+      const printWindow = window.open("", "", "width=800,height=1000");
+      printWindow.document.write(`
+      <html dir="rtl" lang="ar">
+      <head>
+        <meta charset="UTF-8">
+        <title>طباعة الاستعلام - مدرسة الشهيد فريد مجدي فريد</title>
+        <style>
+          @page { size: A4; margin: 1.5cm; }
+          body {
+            font-family: "Cairo", sans-serif;
+            background: white;
+            color: #000;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+          }
+          h2 { color: #003366; margin-bottom: 5px; }
+          h3 { color: #555; margin-top: 0; margin-bottom: 20px; }
+          .card {
+            background: #f9f9f9;
+            border: 1.5px solid #ccc;
+            border-radius: 12px;
+            padding: 10px 15px;
+            margin: 8px auto;
+            width: 85%;
+            text-align: right;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .card .label {
+            font-weight: bold;
+            color: #003366;
+            flex: 1;
+            text-align: right;
+          }
+          .card .value {
+            flex: 2;
+            text-align: center;
+            font-weight: 900;
+            font-size: 19px;
+            color: #000;
+          }
+          .footer {
+            margin-top: 25px;
+            padding-top: 10px;
+            border-top: 2px solid #003366;
+            color: #003366;
+            font-size: 16px;
+          }
+        </style>
+      </head>
+      <body>
+        <h2>📋 نتيجة استعلام الغياب</h2>
+        <h3>مدرسة الشهيد فريد مجدي فريد الصناعية العسكرية</h3>
+        ${content.replaceAll('class="highlight', 'class="card').replaceAll('class="item', 'class="card')}
+        <div class="footer">
+          ✨ مع تحياتي<br>
+          <b>الأستاذ / أيمن محمد البرعي</b><br>
+          وكيل شئون الطلبة<br>
+          📞 01007224443
+        </div>
+      </body>
+      </html>`);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  </script>
+</body>
+</html>
