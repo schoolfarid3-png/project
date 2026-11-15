@@ -234,12 +234,11 @@
 
   <div class="footer">
     ✨ تصميم وتطوير المنصة برعاية ودعم من: <span style="color:var(--accent-color); font-weight:bold;">معرض أبو سمرة كاربت – قويسنا</span><br>
-    🛠️ إشراف وبرمجة: <span style="color:#7df9ff; font-weight:bold;">الأستاذ أيمن محمد البرعي</span> (وكيل شئون الطلبة)<br>
+    🛠️ إشراف وبرمجة: <span style="color:#7df9ff; font-weight:bold;">الأستاذ أيمن محمد البرعي</span> <br>
     📞 <span style="direction: ltr; display: inline-block;">01007224443</span>
   </div>
 
   <script>
-    // ⚠️ ضع هنا رابط الـ Web App الخاص بسكريبت الغياب على جوجل شيت
     const ABSENCE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAcK-ZteO_VqxI-2oUzv9nTxZwGjqwtrZBK5prJ6JpEC6-8ATaDazsc1EzBjYQDOPp/exec";
 
     function setSearchType(type) {
@@ -345,8 +344,8 @@
     }
 
     function goToHome() {
-      // ⚠️ استبدل هذا الرابط برابط صفحة الخدمات أو الرئيسية الخاصة بمنصتك الأساسية
-      window.location.href = "index.html"; 
+      // العودة للصفحة السابقة في المتصفح (قائمة الخدمات الرئيسية) بدلاً من إعادة التوجيه الإجباري
+      history.back();
     }
 
     function printResult() {
@@ -411,7 +410,7 @@
         <div class="footer">
           ✨ مع تحياتي<br>
           <b>الأستاذ / أيمن محمد البرعي</b><br>
-          وكيل شئون الطلبة<br>
+          <br>
           📞 01007224443
         </div>
       </body>
